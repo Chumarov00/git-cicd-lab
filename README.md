@@ -1,4 +1,4 @@
-# Web Calculator API
+# Express Web Calculator API
 
 Веб-калькулятор на Node.js и Express, разработанный в рамках лабораторной работы по Git и CI/CD.
 
