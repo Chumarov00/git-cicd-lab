@@ -1,9 +1,9 @@
 const express = require('express');
+const calculatorRoutes = require('./routes/calculator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Позволяет серверу принимать данные в формате JSON
 app.use(express.json());
 
 // Главная страница API
@@ -14,8 +14,16 @@ app.get('/', (req, res) => {
     });
 });
 
-// Сервер запускается только при прямом выполнении app.js.
-// Это позволит подключать приложение в автоматических тестах.
+// Маршруты калькулятора
+app.use('/api', calculatorRoutes);
+
+// Обработка неизвестных адресов
+app.use((req, res) => {
+    res.status(404).json({
+        error: 'Маршрут не найден'
+    });
+});
+
 if (require.main === module) {
     app.listen(PORT, () => {
         console.log(`Сервер запущен: http://localhost:${PORT}`);
