@@ -1,6 +1,11 @@
 const express = require('express');
+const { validateNumberParam } = require('../middleware/validation');
 
 const router = express.Router();
+
+// Проверка параметров a и b
+router.param('a', validateNumberParam);
+router.param('b', validateNumberParam);
 
 // Сложение
 router.get('/add/:a/:b', (req, res) => {
