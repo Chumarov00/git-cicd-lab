@@ -1,9 +1,14 @@
 const express = require('express');
+const cors = require('cors');
 const calculatorRoutes = require('./routes/calculator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Разрешение запросов с других источников
+app.use(cors());
+
+// Обработка JSON
 app.use(express.json());
 
 // Главная страница API
@@ -24,6 +29,7 @@ app.use((req, res) => {
     });
 });
 
+// Запуск сервера только при прямом выполнении файла
 if (require.main === module) {
     app.listen(PORT, () => {
         console.log(`Сервер запущен: http://localhost:${PORT}`);
