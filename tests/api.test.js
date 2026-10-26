@@ -81,3 +81,23 @@ describe('Calculator API', () => {
         expect(response.body.error).toBe('Маршрут не найден');
     });
 });
+
+describe('Input validation', () => {
+    test('rejects non-numeric parameter a', async () => {
+        const response = await request(app).get('/api/add/abc/3');
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            'Параметр a должен быть числом'
+        );
+    });
+
+    test('rejects non-numeric parameter b', async () => {
+        const response = await request(app).get('/api/multiply/4/test');
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            'Параметр b должен быть числом'
+        );
+    });
+});
