@@ -101,3 +101,12 @@ describe('Input validation', () => {
         );
     });
 });
+
+describe('CORS support', () => {
+    test('adds CORS header to response', async () => {
+        const response = await request(app).get('/');
+
+        expect(response.statusCode).toBe(200);
+        expect(response.headers['access-control-allow-origin']).toBe('*');
+    });
+});
