@@ -1,19 +1,22 @@
-name: Node.js CI
+name: Node.js CI/CD
 
 on:
   push:
     branches:
       - main
+      - develop
+
   pull_request:
     branches:
       - main
+      - develop
 
 permissions:
   contents: read
 
 jobs:
   test:
-    name: Automated tests
+    name: Automated tests and quality checks
     runs-on: ubuntu-latest
 
     steps:
@@ -29,8 +32,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run lint
+        run: npm run lint
+
       - name: Run automated tests
         run: npm test
+
+      - name: Build application
+        run: npm run build
 
       - name: Check test coverage
         run: npm run test:coverage
@@ -67,16 +76,32 @@ jobs:
             sleep 2
           done
 
+          echo "API did not start"
           docker logs web-calculator
           exit 1
+
+      - name: Check addition endpoint
+        run: |
+          curl --fail --silent \
+            http://localhost:3000/api/add/2/3
+
+      - name: Check multiplication endpoint
+        run: |
+          curl --fail --silent \
+            http://localhost:3000/api/multiply/4/5
 
       - name: Show container status
         if: always()
         run: docker ps -a
 
+      - name: Show container logs
+        if: always()
+        run: docker logs web-calculator || true
+
       - name: Remove test container
         if: always()
         run: docker rm -f web-calculator || true
+
   publish:
     name: Publish Docker image
     needs: docker-build
@@ -107,7 +132,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/chumarov00/git-cicd-lab:latest
+            ghcr.io/chumarov00/git-cicd-lab:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
