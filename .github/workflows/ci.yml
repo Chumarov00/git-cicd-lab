@@ -8,8 +8,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   test:
+    name: Automated tests
     runs-on: ubuntu-latest
 
     steps:
@@ -30,3 +34,46 @@ jobs:
 
       - name: Check test coverage
         run: npm run test:coverage
+
+  docker-build:
+    name: Docker build and API check
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v6
+
+      - name: Build Docker image
+        run: docker build -t web-calculator-api:${{ github.sha }} .
+
+      - name: Start Docker container
+        run: |
+          docker run -d \
+            --name web-calculator \
+            -p 3000:3000 \
+            web-calculator-api:${{ github.sha }}
+
+      - name: Check API availability
+        run: |
+          for attempt in {1..15}; do
+            if curl --fail --silent http://localhost:3000/; then
+              echo
+              echo "API is available"
+              exit 0
+            fi
+
+            echo "Waiting for API..."
+            sleep 2
+          done
+
+          docker logs web-calculator
+          exit 1
+
+      - name: Show container status
+        if: always()
+        run: docker ps -a
+
+      - name: Remove test container
+        if: always()
+        run: docker rm -f web-calculator || true
