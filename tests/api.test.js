@@ -13,7 +13,7 @@ describe('Calculator API', () => {
         const response = await request(app).get('/api/add/2/3');
 
         expect(response.statusCode).toBe(200);
-        expect(response.body.result).toBe(6);
+        expect(response.body.result).toBe(5);
     });
 
     test('subtracts 4 from 10', async () => {
